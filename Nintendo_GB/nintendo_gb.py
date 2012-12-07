@@ -63,43 +63,43 @@ def load_file(li, neflags, format):
 	size = li.tell()
 
 	# ROM0
-	idc.AddSeg(ROM0_START, ROM0_START + ROM0_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(ROM0_START, ROM0_START + ROM0_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(ROM0_START, "ROM0")
 	idc.SetSegmentType(ROM0_START, idc.SEG_CODE)
 	li.seek(0)
 	li.file2base(0, ROM0_START, ROM0_START + ROM0_SIZE, 0)
 
 	# ROM1
-	idc.AddSeg(ROM1_START, ROM1_START + ROM1_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(ROM1_START, ROM1_START + ROM1_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(ROM1_START, "ROM1")
 	idc.SetSegmentType(ROM1_START, idc.SEG_CODE)
 
 	# VRAM
-	idc.AddSeg(VRAM_START, VRAM_START + VRAM_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(VRAM_START, VRAM_START + VRAM_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(VRAM_START, "VRAM")
 
 	# RAM1
-	idc.AddSeg(RAM1_START, RAM1_START + RAM1_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(RAM1_START, RAM1_START + RAM1_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(RAM1_START, "RAM1")
 
 	# RAM0
-	idc.AddSeg(RAM0_START, RAM0_START + RAM0_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(RAM0_START, RAM0_START + RAM0_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(RAM0_START, "RAM0")
 
 	# ECHO
-	idc.AddSeg(ECHO_START, ECHO_START + ECHO_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(ECHO_START, ECHO_START + ECHO_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(ECHO_START, "ECHO")
 
 	# OAM
-	idc.AddSeg(OAM_START, OAM_START + OAM_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(OAM_START, OAM_START + OAM_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(OAM_START, "OAM")
 
 	# IO
-	idc.AddSeg(IO_START, IO_START + IO_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(IO_START, IO_START + IO_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(IO_START, "IO")
 
 	# HRAM
-	idc.AddSeg(HRAM_START, HRAM_START + HRAM_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
+	idc.AddSeg(HRAM_START, HRAM_START + HRAM_SIZE, 0, 0, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(HRAM_START, "HRAM")
 
 	header_info(li)
