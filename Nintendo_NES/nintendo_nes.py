@@ -133,10 +133,23 @@ def load_file(li, neflags, format):
 	idaapi.add_entry(Word(0xFFFC), Word(0xFFFC), "start", 1)
 	idaapi.cvar.inf.startIP = Word(0xFFFC)
 	idaapi.cvar.inf.beginEA = Word(0xFFFC)	
-
+	header_info(li, 0xFFEF)
 
 	print("[+] Load OK")
 	return 1
+
+def header_info(li, addr):
+	idaapi.add_long_cmt(addr, True, "-------------------------------")
+	li.seek(0x0)
+	idc.ExtLinA(addr, 1,  "; ROM HEADER")
+	idc.ExtLinA(addr, 2,  "; Signature : %s" % li.read(4))
+	idc.ExtLinA(addr, 3,  "; Number of 16K PRG-ROM Pages : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(addr, 4,  "; Number of 8K CHR-ROM Pages : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(addr, 5,  "; Cartridge Type LSB : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(addr, 6,  "; Cartridge Type MSB : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(addr, 7,  "; Number of 8K RAM : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(addr, 8,  "-------------------------------")
+
 
 def naming():
 	MakeNameEx(0xFFFA, "NMI_vector", SN_NOCHECK | SN_NOWARN)
