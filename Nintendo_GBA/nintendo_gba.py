@@ -16,6 +16,9 @@ def dwordAt(li, off):
 		return 0
 	return struct.unpack('<I', s)[0]
 
+def memset_seg(ea, size):
+	for i in xrange(0, size):
+		idc.PatchByte(ea + i, 0)
 
 def accept_file(li, n):
 	# we support only one format per file
@@ -43,26 +46,42 @@ def load_file(li, neflags, format):
 			# Adding Header Section
 			idc.AddSeg(ROM_START, ROM_START + SIZE_HEADER, 0, 1, idaapi.saRelPara, idaapi.scPub)
 			idc.RenameSeg(ROM_START, "HEADER")
+			idc.SetSegmentType(ROM_START, idc.SEG_CODE)
 			li.seek(0)
         		li.file2base(0, ROM_START, ROM_START + SIZE_HEADER, 0)
+
+			# Adding OEP
+			idaapi.add_entry(ROM_START, ROM_START, "start", 1)
+			idaapi.cvar.inf.startIP = ROM_START
+			idaapi.cvar.inf.beginEA = ROM_START
 
 			# Adding ROM Section
 			idc.AddSeg(ROM_START + SIZE_HEADER, ROM_START + (ROM_SIZE - SIZE_HEADER), 0, 1, idaapi.saRelPara, idaapi.scPub)
 			idc.RenameSeg(ROM_START + SIZE_HEADER, "ROM")
-			print("READING %X" % (size - SIZE_HEADER))
+			idc.SetSegmentType(ROM_START + SIZE_HEADER, idc.SEG_CODE)
 			li.seek(SIZE_HEADER)
         		li.file2base(0, ROM_START + SIZE_HEADER, ROM_START + size, 0)
-
-			# Adding OEP
-			idaapi.add_entry(ROM_START, ROM_START, "start", 1)
 
 			# Adding EWRAM
 			idc.AddSeg(0x02000000, 0x02040000, 0, 1, idaapi.saRelPara, idaapi.scPub)
 			idc.RenameSeg(0x02000000, "EWRAM")
+			memset_seg(0x02000000, 0x40000)
 
 			# Adding IWRAM
 			idc.AddSeg(0x03000000, 0x03008000, 0, 1, idaapi.saRelPara, idaapi.scPub)
-			idc.RenameSeg(0x02000000, "IWRAM")
+			idc.RenameSeg(0x03000000, "IWRAM")
+			memset_seg(0x03000000, 0x8000)
+
+			# Adding IO / Registers
+			idc.AddSeg(0x04000000, 0x04000400, 0, 1, idaapi.saRelPara, idaapi.scPub)
+			idc.RenameSeg(0x04000000, "IOregisters")
+			memset_seg(0x04000000, 0x400)
+
+			# Adding BIOS System ROM
+			idc.AddSeg(0x00000000, 0x00004000, 0, 1, idaapi.saRelPara, idaapi.scPub)
+			idc.RenameSeg(0x00000000, "BIOS")
+			memset_seg(0x00000000, 0x4000)
+			idc.SetSegmentType(0x0000000, idc.SEG_CODE)
 
 			print("[+] Load OK")
 			return 1
