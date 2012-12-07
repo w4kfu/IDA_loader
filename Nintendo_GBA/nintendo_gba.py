@@ -55,6 +55,15 @@ def load_file(li, neflags, format):
 
 			# Adding OEP
 			idaapi.add_entry(ROM_START, ROM_START, "start", 1)
+
+			# Adding EWRAM
+			idc.AddSeg(0x02000000, 0x02040000, 0, 1, idaapi.saRelPara, idaapi.scPub)
+			idc.RenameSeg(0x02000000, "EWRAM")
+
+			# Adding IWRAM
+			idc.AddSeg(0x03000000, 0x03008000, 0, 1, idaapi.saRelPara, idaapi.scPub)
+			idc.RenameSeg(0x02000000, "IWRAM")
+
 			print("[+] Load OK")
 			return 1
 	Warning("Unknown format name: '%s'" % format)
