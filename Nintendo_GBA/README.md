@@ -6,7 +6,7 @@ IDA Pro loader module for Nintendo GameBoy Advance and signatures from SDK
 
 * nintendo_gba.py : IDA Module
 * gen_io_naming.py : Generate all the I/O register naming
-* io_registers.txt : Information from [1][http://nocash.emubase.de/gbatek.htm#gbaiomap]
+* io_registers.txt : Information from [http://nocash.emubase.de/gbatek.htm#gbaiomap][1]
 * libgbabackup.sig : signature generated from file libagbbackup.a
 * libgbabir.sig : signature generated from file libagbir.a
 * libgbabprn.sig : signature generated from file libisagbprn.a
