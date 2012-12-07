@@ -102,9 +102,31 @@ def load_file(li, neflags, format):
 	idc.AddSeg(HRAM_START, HRAM_START + HRAM_SIZE, 0, 1, idaapi.saRelPara, idaapi.scPub)
 	idc.RenameSeg(HRAM_START, "HRAM")
 
+	header_info(li)
 	naming()
 	print("[+] Load OK")
 	return 1
+
+def header_info(li):
+	idaapi.add_long_cmt(0, True, "-------------------------------")
+	li.seek(0x100)
+	idc.ExtLinA(0, 1,  "; ROM HEADER")
+	idc.ExtLinA(0, 2,  "; Entry Point : %04X" % (struct.unpack("<I", li.read(4))[0] >> 0x10))
+	li.read(0x30)
+	idc.ExtLinA(0, 3,  "; TITLE : %s" % li.read(0xF))
+	idc.ExtLinA(0, 4,  "; Manufacturer Code : %s" % li.read(4))
+	idc.ExtLinA(0, 5,  "; CGB Flag : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 6,  "; New Licensee Code : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 7,  "; SGB Flag : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 8,  "; Cartridge Type : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 9,  "; ROM Size : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 10,  "; RAM Size : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 11,  "; Destination Code : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 12,  "; Old license Code : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 13,  "; Mask ROM Version number : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 14,  "; Header Checksum : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 15,  "; Global Checksum : %02X" % struct.unpack("<B", li.read(1))[0])
+	idc.ExtLinA(0, 16,  "-------------------------------")
 
 def naming():
 	MakeNameEx(0xFF40, "LCD_Control", SN_NOCHECK | SN_NOWARN)
