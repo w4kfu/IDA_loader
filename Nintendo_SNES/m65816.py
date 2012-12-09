@@ -755,8 +755,11 @@ class m65816_processor_t(idaapi.processor_t):
 		# SEC
 		elif opcode == 0x38:
 			cmd.itype = self.inames["sec"]
-		# SEI
+		# SED
 		elif opcode == 0xF8:
+			cmd.itype = self.inames["sed"]
+		# SEI
+		elif opcode == 0x78:
 			cmd.itype = self.inames["sei"]
 		# SEP
 		elif opcode == 0xE2:
