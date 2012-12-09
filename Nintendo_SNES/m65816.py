@@ -69,7 +69,7 @@ class m65816_processor_t(idaapi.processor_t):
 
     	instruc = instrs = [
 		# ADC
-		{'name': 'addc',  'feature': CF_USE1 | CF_USE2, 'cmt': "Adds operand to the Accumulator; adds an additional 1 if carry is set."},
+		{'name': 'adc',  'feature': CF_USE1 | CF_USE2, 'cmt': "Adds operand to the Accumulator; adds an additional 1 if carry is set."},
 		# AND
 		{'name': 'and',  'feature': CF_USE1 | CF_USE2, 'cmt': "The operand is \"AND\"ed to the Accumulator."},
 		# ASL
@@ -586,7 +586,7 @@ class m65816_processor_t(idaapi.processor_t):
 		# DEC
 		elif opcode in [0x3A, 0xC6, 0xCE, 0xD6, 0xDE]:
 			cmd.itype = self.inames["dec"]
-			self.handle_dec(opcode)
+			self.handle_type(opcode)
 		# DEX
 		elif opcode == 0xCA:
 			cmd.itype = self.inames["dex"]
