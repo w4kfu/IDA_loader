@@ -160,6 +160,8 @@ class m65816_processor_t(idaapi.processor_t):
 		{'name': 'per',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Program Counter Relative"},
 		# PHA
 		{'name': 'pha',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push accumulator"},
+		# PHP
+		{'name': 'php',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Processor Status Register"},
 		# PHD
 		{'name': 'phd',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Direct Page Register"},
 		# PHK
