@@ -606,12 +606,19 @@ class m65816_processor_t(idaapi.processor_t):
 		# INY
 		elif opcode == 0xC8:
 			cmd.itye = self.inames["iny"]
+		# JML
+		elif ocpode in [0xDC]:
+			cmd.itype = self.inames["jml"]
+			self.handle_jump(opcode)
 		# JMP
 		elif opcode in [0x4C, 0x5C, 0x6C, 0x7C, 0xDC]:
 			cmd.itype = self.inames["jmp"]
 			self.handle_jump(opcode)
+		# JSL
+		elif  opcode == 0x22:
+			cmd.itype = self.inames["jsl"]
 		# JSR
-		elif opcode in [0x20, 0x22, 0xFC]:
+		elif opcode in [0x20, 0xFC]:
 			cmd.itype = self.inames["jsr"]
 			self.handle_jsr(opcode)
 		# LDA
