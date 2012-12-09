@@ -513,7 +513,7 @@ class m65816_processor_t(idaapi.processor_t):
 		# BIT
 		elif opcode in [0x24, 0x2C, 0x34, 0x3C, 0x89]:
 			cmd.itype = self.inames["bit"]
-			self.handle_bit(opcode)
+			self.handle_type(opcode)
 		# BCC
 		elif opcode == 0x90:
 			cmd.itype = self.inames["bcc"]
