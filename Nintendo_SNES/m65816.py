@@ -133,7 +133,7 @@ class m65816_processor_t(idaapi.processor_t):
 		# JML
 		{'name': 'jml',  'feature': CF_USE1 | CF_USE2, 'cmt': "Jump long"},
 		# JSR
-		{'name': 'jsr',  'feature': CF_USE1 | CF_USE2, 'cmt': "Jump subroutine"},
+		{'name': 'jsr',  'feature': CF_USE1, 'cmt': "Jump subroutine"},
 		# JSL
 		{'name': 'jsl',  'feature': CF_USE1 | CF_USE2, 'cmt': "Jump subroutine long"},
 		# LDA
@@ -412,6 +412,23 @@ class m65816_processor_t(idaapi.processor_t):
 		cmd[1].type = o_reg
 		cmd[1].reg = 1
 
+	def handle_absolute_indirect(self):
+		cmd = self.cmd
+		cmd[0].type = o_phrase
+		cmd[0].dtype = dt_word
+		cmd[0].addr = self._read_cmd_word()
+		cmd[0].reg = 0xFFFF
+
+	def handle_absolute_indexed_indirect(self):
+		cmd = self.cmd
+		cmd[0].type = o_displ
+		cmd[0].dtype = dt_word
+		cmd[0].addr = self._read_cmd_word()
+		cmd[0].reg = 1
+	
+	def handle_absolute_indirect_long(self):
+		self.handle_absolute_indirect()
+
 	def handle_type(self, opcode):
 		table_handle = [
 				self.handle_immediate, 				# 0x00 TO CHECK !
@@ -455,10 +472,24 @@ class m65816_processor_t(idaapi.processor_t):
 		cmd[0].addr = self.cmd.ea + self.u8_to_s8(self._read_cmd_byte()) + 2
 
 	def handle_jump(self, opcode):
-		pass
+		if opcode == 0x4C:
+			self.handle_absolute()
+		elif opcode == 0x5C:
+			self.handle_absolute_long()
+		elif opcode == 0x6C:
+			self.handle_absolute_indirect()
+		elif opcode == 0x7C:
+			self.handle_absolute_indexed_indirect()
+		elif opcode == 0xDC:
+			self.handle_absolute_indirect_long()
 
 	def handle_jsr(self, opcode):
-		pass
+		if opcode == 0x20:
+			self.handle_absolute()
+		elif opcode == 0x22:
+			self.handle_absolute_long()
+		elif opcode == 0xFC:
+			self.handle_absolute_indexed_indirect()
 
 	def handle_push_pull(self, opcode, reg):
 		cmd[0].type = o_reg
@@ -652,7 +683,7 @@ class m65816_processor_t(idaapi.processor_t):
 		# PHK
 		elif opcode == 0x4B:
 			cmd.itype = self.inames["phk"]
-			self.handle_push_pull(opcode, 7) # DA FUCK !?
+			self.handle_push_pull(opcode, 9)
 		# PHP
 		elif opcode == 0x08:
 			cmd.itype = self.inames["php"]
@@ -849,19 +880,35 @@ class m65816_processor_t(idaapi.processor_t):
         	elif op.type == o_phrase:
             		out_symbol('(')
 			if op.reg == 0xFFFF:
-				out_name_expr(op, op.addr, BADADDR)
+				ok = out_name_expr(op, op.addr, BADADDR)
+            			if not ok:
+                			out_tagon(COLOR_ERROR)
+                			OutLong(op.addr, 16)
+                			out_tagoff(COLOR_ERROR)
+                			QueueMark(Q_noName, self.cmd.ea)
 			else:
             			out_register(self.reg_names[op.reg])
             		out_symbol(')')
         	elif op.type == o_displ:
             		out_symbol('(')
-            		out_name_expr(op, op.addr, BADADDR)
-            		out_symbol(', ')
+            		ok = out_name_expr(op, op.addr, BADADDR)
+			if not ok:
+				out_tagon(COLOR_ERROR)
+				OutLong(op.addr, 16)
+				out_tagoff(COLOR_ERROR)
+				QueueMark(Q_noName, self.cmd.ea)
+            		out_symbol(',')
+            		out_symbol(' ')
             		out_register(self.reg_names[op.reg])
             		out_symbol(')')
 		elif op.type == o_long:
             		out_symbol('[')
-            		out_name_expr(op, op.addr, BADADDR)
+            		ok = out_name_expr(op, op.addr, BADADDR)
+			if not ok:
+				out_tagon(COLOR_ERROR)
+				OutLong(op.addr, 16)
+				out_tagoff(COLOR_ERROR)
+				QueueMark(Q_noName, self.cmd.ea)
             		out_symbol(']')
         	else:
             		return False
