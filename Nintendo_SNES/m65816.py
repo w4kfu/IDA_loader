@@ -248,6 +248,8 @@ class m65816_processor_t(idaapi.processor_t):
 		{'name': 'tsb',  'feature': CF_USE1, 'cmt': "Test and set bit"},
 		# WAI
 		{'name': 'wai',  'feature': 0, 'cmt': "Wait for Interupt"},
+		# XBA
+		{'name': 'xba',  'feature': CF_USE1 | CF_USE2, 'cmt': "Exchange B and A 8-bit Accumulators"}
 		# XCE
 		{'name': 'xce',  'feature': CF_USE1 | CF_USE2, 'cmt': "Exchange Carry with emulation"}
 		]
