@@ -551,6 +551,12 @@ class m65816_processor_t(idaapi.processor_t):
 		# BRK
 		elif opcode == 0x00:
 			cmd.itype = self.inames["brk"]
+		# BRL
+		elif opcode == 0x82:
+			cmd.itype = self.inames["brl"]
+			cmd[0].type = o_near
+			cmd[0].dtype = dt_word
+			cmd[0].addr = self.cmd.ea + self._read_cmd_word() + 3
 		# BVC
 		elif opcode == 0x50:
 			cmd.itype = self.inames["bvc"]
