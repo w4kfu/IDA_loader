@@ -162,6 +162,8 @@ class m65816_processor_t(idaapi.processor_t):
 		{'name': 'per',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Program Counter Relative"},
 		# PHA
 		{'name': 'pha',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push accumulator"},
+		# PHB
+		{'name': 'phb',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Data Bank Register"},
 		# PHP
 		{'name': 'php',  'feature': CF_USE1 | CF_USE2, 'cmt': "Push Processor Status Register"},
 		# PHD
@@ -278,15 +280,15 @@ class m65816_processor_t(idaapi.processor_t):
 	def _read_cmd_word(self):
         	ea = self.cmd.ea + self.cmd.size
         	byte = get_full_byte(ea)
-		byte |= get_full_byte(ea) << 8
+		byte |= get_full_byte(ea + 1) << 8
         	self.cmd.size += 2		
         	return byte
 
 	def _read_cmd_lword(self):
         	ea = self.cmd.ea + self.cmd.size
         	byte = get_full_byte(ea)
-		byte |= get_full_byte(ea) << 8
-		byte |= get_full_byte(ea) << 16
+		byte |= get_full_byte(ea + 1) << 8
+		byte |= get_full_byte(ea + 2) << 16
         	self.cmd.size += 3
         	return byte
 
@@ -556,7 +558,9 @@ class m65816_processor_t(idaapi.processor_t):
 			cmd.itype = self.inames["brl"]
 			cmd[0].type = o_near
 			cmd[0].dtype = dt_word
-			cmd[0].addr = self.cmd.ea + self._read_cmd_word() + 3
+			dst = self._read_cmd_word()
+			print("WORD = %X" % dst)
+			cmd[0].addr = self.cmd.ea + dst + 3
 		# BVC
 		elif opcode == 0x50:
 			cmd.itype = self.inames["bvc"]
