@@ -691,6 +691,10 @@ class m65816_processor_t(idaapi.processor_t):
 			cmd[0].dtype = dt_byte
 			cmd[0].addr = self._read_cmd_byte()
 			cmd[0].reg = -1
+		# PER
+		elif opcode == 0x62: # TO CHECK
+			cmd.itype = self.inames["per"]
+			self.handle_branch()
 		# PHA
 		elif opcode == 0x48:
 			cmd.itype = self.inames["pha"]
