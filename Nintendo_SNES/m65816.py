@@ -174,6 +174,8 @@ class m65816_processor_t(idaapi.processor_t):
 		{'name': 'phy',  'feature': 0, 'cmt': "Push Y"},
 		# PLA
 		{'name': 'pla',  'feature': CF_USE1 | CF_USE2, 'cmt': "Pull accumulator"},
+		# PLB
+		{'name': 'plb',  'feature': CF_USE1 | CF_USE2, 'cmt': "Pull Data Bank Register"},
 		# PLD
 		{'name': 'pld',  'feature': CF_USE1 | CF_USE2, 'cmt': "Pull Direct Page Register"},
 		# PLP
