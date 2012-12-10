@@ -146,6 +146,8 @@ class m65816_processor_t(idaapi.processor_t):
 		{'name': 'lsr',  'feature': CF_USE1 | CF_USE2, 'cmt': "Shift Right Accumulator, Memory"},
 		# MVN
 		{'name': 'mvn',  'feature': CF_USE1 | CF_USE2, 'cmt': "Block move negative"},
+		# MVS
+		{'name': 'mvs',  'feature': CF_USE1 | CF_USE2, 'cmt': "Block move positive"},
 		# MVP
 		{'name': 'mvp',  'feature': CF_USE1 | CF_USE2, 'cmt': "Block move positive"},
 		# NOP
