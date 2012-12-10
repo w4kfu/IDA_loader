@@ -559,7 +559,6 @@ class m65816_processor_t(idaapi.processor_t):
 			cmd[0].type = o_near
 			cmd[0].dtype = dt_word
 			dst = self._read_cmd_word()
-			print("WORD = %X" % dst)
 			cmd[0].addr = self.cmd.ea + dst + 3
 		# BVC
 		elif opcode == 0x50:
