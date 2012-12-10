@@ -649,7 +649,7 @@ class m65816_processor_t(idaapi.processor_t):
 			cmd[1].dtyp = dt_byte
 			cmd[1].addr = self._read_cmd_byte()
 		# MVS
-		elif opcode == 0x54:
+		elif opcode == 0x44:
 			cmd.itype = self.inames["mvs"]
 			cmd[0].type = o_mem
 			cmd[0].dtyp = dt_byte
