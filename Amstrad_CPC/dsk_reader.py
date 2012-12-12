@@ -17,10 +17,10 @@ SECTORINFO = [
 	("track", BYTE),
 	("side", BYTE),
 	("sectorID", BYTE),
-	("sectorSize", BYTE),
+	("size", BYTE),
 	("FDC1", BYTE),
 	("FDC2", BYTE),
-	("unused1", WORD),
+	("SectSize", WORD),
 	]
 
 TRACKINFO = [
@@ -43,6 +43,24 @@ DIRENTRY = [
 	("unused", WORD),
 	("nbpages", BYTE),
 	("blocks", BYTE * 16)
+	]
+
+STAMSDOS = [
+	("usernumber", BYTE),
+	("filename", BYTE * 15),
+	("blocknum", BYTE),
+	("lastblock", BYTE),
+	("filetype", BYTE),
+	("length", WORD),
+	("adress", WORD),
+	("firstblock", BYTE),
+	("logicallength", WORD),
+	("entryadress", WORD),
+	("unused", BYTE * 0x24),
+	("reallength", WORD),
+	("biglength", BYTE),
+	("checksum", WORD),
+	("unused2", BYTE * 0x3B)
 	]
 
 def isprint(c):
@@ -123,9 +141,10 @@ class DskReader():
 			print("track : %d" % self.sector['track'])
 			print("side : %d" % self.sector['side'])
 			print("SectorID : %d" % self.sector['sectorID'])
-			print("SectorSize : %d" % self.sector['sectorSize'])
+			print("Size : %d" % self.sector['size'])
+			print("SectorSize : %d" % self.sector['SectSize'])
 		self.file.seek(0x100 * 2, 0)
-		data = self.file.read(self.sector['sectorSize'] * 0x100)
+		data = self.file.read(self.sector['size'] * 0x100)
 		hexdump(data, ' ', 16)
 		for i in xrange(0, 64):
 			self.getinfodirectory(i)
@@ -141,8 +160,8 @@ class DskReader():
 				if i == tk:
 					if ((sector['sectorID'] == sect) and physik == 1) or ((j == sect) and physik == 0):
 						break
-				if sector['sectorSize'] != 0:
-					Pos += sector['sectorSize']
+				if sector['SectSize'] != 0:
+					Pos += sector['SectSize']
 				else:
 					Pos += (128 << sector['size'])
 		return Pos
@@ -152,15 +171,20 @@ class DskReader():
 		directory = depack(DIRENTRY, self.file)
 		#if directory['user'] == 0xE5:		# USER_DELETED
 		#	return
-		# ???
 		if directory['numpage'] != 0:
 			return
 		if self.namevalid(''.join(map(chr, directory['name']))) == False:
 			return
+		print("--- New Entry ---")
 		print("User %d" % directory['user'])
 		print("Name %s" % self.Nameamsdos(''.join(map(chr, directory['name'])), ''.join(map(chr, directory['ext']))))
-		#print("Ext %s" % )
-			
+		print("NumPage %d" % directory['numpage'])
+		print("NbPages %d" % directory['nbpages'])
+		print("Size %d" % ((directory['nbpages'] + 7 ) >> 3))
+		bloc = self.readbloc(directory['blocks'][0])
+		#hexdump(bloc, ' ', 16)
+		print("Length %X" % struct.unpack(WORD, bloc[24]+bloc[25])[0])
+		print("Adress %X" % struct.unpack(WORD, bloc[21]+bloc[22])[0])
 
 	def namevalid(self, name):
 		for c in xrange(0, 8):
@@ -178,6 +202,22 @@ class DskReader():
 				sect = sector['sectorID']
 		return sect
 
+	def readbloc(self, bloc):
+		track = (bloc << 1) / 9
+		sect = (bloc << 1) % 9
+		minsect = self.getminsect()
+		pos = self.getposdata(track, sect + minsect, 1)
+		self.file.seek(pos, 0)
+		bloc = self.file.read(512)
+		sect += 1
+		if sect > 8:
+			track += 1
+			sect = 0
+		pos = self.getposdata(track, sect + minsect, 1)
+		self.file.seek(pos, 0)
+		bloc += self.file.read(512)
+		return bloc
+
 	def Nameamsdos(self, name, ext):
 		res = ""
 		for c in name:
@@ -186,8 +226,6 @@ class DskReader():
 		res += "."
 		for i in xrange(0, 3):
 			res += ext[i]
-		#for i in len(res):
-		#	res[i] 
 		return res
 
 def main():
