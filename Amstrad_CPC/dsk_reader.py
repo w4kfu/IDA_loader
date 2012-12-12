@@ -1,8 +1,8 @@
 import struct
 
-
 BYTE = "B"
 WORD = "H"
+DWORD = "I"
 
 DISKINFO = [
 	("magic", BYTE * 0x22),		# 0x00-0x21
@@ -34,6 +34,21 @@ TRACKINFO = [
 	("gap", BYTE),			# 0x16
 	("fill", BYTE)			# 0x17
 	]
+
+DIRENTRY = [
+	("user", BYTE),
+	("name", BYTE * 8),
+	("ext", BYTE * 3),
+	("numpage", BYTE),
+	("unused", WORD),
+	("nbpages", BYTE),
+	("blocks", BYTE * 16)
+	]
+
+def isprint(c):
+	if ord(c) >= 32 and ord(c) <= 126:
+		return True
+	return False
 
 def hexdump(chars, sep, width):
 	offset = 0
@@ -68,7 +83,6 @@ def depack(descr, file, endiannes = "<"):
             		continue
         	raise DescriptionError("Unhandled type for field : " + field)
     	return struct
-
 
 class DskReader():
 
@@ -113,6 +127,68 @@ class DskReader():
 		self.file.seek(0x100 * 2, 0)
 		data = self.file.read(self.sector['sectorSize'] * 0x100)
 		hexdump(data, ' ', 16)
+		for i in xrange(0, 64):
+			self.getinfodirectory(i)
+
+	def getposdata(self, tk, sect, physik):
+		Pos = 0x100
+		for i in xrange(0, tk + 1):
+			self.file.seek(Pos, 0)
+			track = depack(TRACKINFO, self.file)
+			Pos += 0x100
+			for j in xrange(0, track['numberofsectors']):
+				sector = depack(SECTORINFO, self.file)
+				if i == tk:
+					if ((sector['sectorID'] == sect) and physik == 1) or ((j == sect) and physik == 0):
+						break
+				if sector['sectorSize'] != 0:
+					Pos += sector['sectorSize']
+				else:
+					Pos += (128 << sector['size'])
+		return Pos
+
+	def getinfodirectory(self, numdir):
+		self.file.seek(((numdir & 15) << 5) + self.getposdata(0, (numdir >> 4) + self.getminsect(), 1), 0)
+		directory = depack(DIRENTRY, self.file)
+		#if directory['user'] == 0xE5:		# USER_DELETED
+		#	return
+		# ???
+		if directory['numpage'] != 0:
+			return
+		if self.namevalid(''.join(map(chr, directory['name']))) == False:
+			return
+		print("User %d" % directory['user'])
+		print("Name %s" % self.Nameamsdos(''.join(map(chr, directory['name'])), ''.join(map(chr, directory['ext']))))
+		#print("Ext %s" % )
+			
+
+	def namevalid(self, name):
+		for c in xrange(0, 8):
+			if isprint(name[c]) == 0:
+				return False
+		return True
+	
+	def getminsect(self):
+		self.file.seek(0x100, 0)
+		sect = 0x100
+		track = depack(TRACKINFO, self.file)
+		for i in xrange(0, track['numberofsectors']):
+			sector = depack(SECTORINFO, self.file)
+			if (sect > sector['sectorID']):
+				sect = sector['sectorID']
+		return sect
+
+	def Nameamsdos(self, name, ext):
+		res = ""
+		for c in name:
+			if c > ' ' and c != '.':
+				res += c
+		res += "."
+		for i in xrange(0, 3):
+			res += ext[i]
+		#for i in len(res):
+		#	res[i] 
+		return res
 
 def main():
 	dskr = DskReader("Lode_Runner.dsk")
